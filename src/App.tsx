@@ -2,14 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useInitializeWeb3 } from "./hooks/useInitializeWeb3";
 import { weenusTokenABI } from "./contracts/weenusTokenABI";
 import { Header } from "./components/Header";
+import { Balance } from "./components/Balance";
 
 const weenusTokenContractAddress = "0x101848D5C5bBca18E6b4431eEdF6B95E9ADF82FA";
-const decimalPlaces = 1e18;
 const testSendAccount = "0x0000000000000000000000000000000000000000";
-
-const balanceDataToNumber = (data: string): number => {
-  return parseInt(data) / decimalPlaces;
-};
 
 export const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState("");
@@ -72,11 +68,8 @@ export const App: React.FC = () => {
       <div className="content">
         <button onClick={onSendWeenusClick}>Send 10% of Weenus</button>
 
-        <div>
-          <h2>Balances</h2>
-
-          <p>Eth balance: {balanceDataToNumber(ethBalance)}</p>
-          <p>Weenus balance: {balanceDataToNumber(weenusBalance)}</p>
+        <div className="flex items-center">
+          <Balance ethBalance={ethBalance} weenusBalance={weenusBalance} />
         </div>
       </div>
     </div>
