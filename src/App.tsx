@@ -68,7 +68,7 @@ export const App: React.FC = () => {
       <div className="content">
         <button onClick={onSendWeenusClick}>Send 10% of Weenus</button>
 
-        <div className="flex items-center">
+        <div className="flex justify-center">
           <Balance ethBalance={ethBalance} weenusBalance={weenusBalance} />
         </div>
       </div>
