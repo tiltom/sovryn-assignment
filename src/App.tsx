@@ -3,16 +3,22 @@ import { useInitializeWeb3 } from "./hooks/useInitializeWeb3";
 import { weenusTokenABI } from "./contracts/weenusTokenABI";
 import { Header } from "./components/Header";
 import { SendForm } from "./components/SendForm";
+import { SendConfirmationDialog } from "./components/SendConfirmationDialog/index";
 
 const weenusTokenContractAddress = "0x101848D5C5bBca18E6b4431eEdF6B95E9ADF82FA";
 const testSendAccount = "0x0000000000000000000000000000000000000000";
+const decimalPlaces = 1e18;
+
+const balanceDataToNumber = (data: string): number => {
+  return parseInt(data) / decimalPlaces;
+};
 
 export const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [ethBalance, setEthBalance] = useState("0");
   const [weenusBalance, setWeenusBalance] = useState("0");
-  
-  const [recipientAddress, setRecipientAddress] = useState('0');
+
+  const [recipientAddress, setRecipientAddress] = useState("0");
   const [multiplier, setMultiplier] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -42,11 +48,14 @@ export const App: React.FC = () => {
   //   contract.methods.balanceOf(currentAccount).call().then(setWeenusBalance);
   // };
 
-  const onSendFormSubmitClick = (recipientAddress: string, multiplier: number) => {
+  const onSendFormSubmitClick = (
+    recipientAddress: string,
+    multiplier: number
+  ) => {
     setRecipientAddress(recipientAddress);
     setMultiplier(multiplier);
     setShowConfirmation(true);
-  }
+  };
 
   const onSendWeenusClick = () => {
     const contract = new web3.eth.Contract(
@@ -58,7 +67,9 @@ export const App: React.FC = () => {
       }
     );
 
-    const adjustedSendAmount = web3.utils.toBN(parseInt(weenusBalance) / 10);
+    const adjustedSendAmount = web3.utils.toBN(
+      parseInt(weenusBalance) * multiplier
+    );
     contract.methods
       .transfer(testSendAccount, adjustedSendAmount)
       .send()
@@ -76,10 +87,24 @@ export const App: React.FC = () => {
       />
 
       <div className="content">
-        <button onClick={onSendWeenusClick}>Send 10% of Weenus</button>
-
         <div className="flex justify-center">
-          <SendForm ethBalance={ethBalance} weenusBalance={weenusBalance} onSubmitClick={onSendFormSubmitClick} />
+          {showConfirmation ? (
+            <SendConfirmationDialog
+              amount={`${balanceDataToNumber(
+                web3.utils.toBN(parseInt(weenusBalance) * multiplier).toString()
+              )}`}
+              sender={currentAccount}
+              receiver={recipientAddress}
+              txFee="0.0006 Gwei"
+              onClick={onSendWeenusClick}
+            />
+          ) : (
+            <SendForm
+              ethBalance={ethBalance}
+              weenusBalance={weenusBalance}
+              onSubmitClick={onSendFormSubmitClick}
+            />
+          )}
         </div>
       </div>
     </div>
