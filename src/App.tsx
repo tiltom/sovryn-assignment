@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useInitializeWeb3 } from "./hooks/useInitializeWeb3";
 import { weenusTokenABI } from "./contracts/weenusTokenABI";
 import { Header } from "./components/Header";
-import { Balance } from "./components/Balance";
+import { SendForm } from "./components/SendForm";
 
 const weenusTokenContractAddress = "0x101848D5C5bBca18E6b4431eEdF6B95E9ADF82FA";
 const testSendAccount = "0x0000000000000000000000000000000000000000";
@@ -11,6 +11,10 @@ export const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [ethBalance, setEthBalance] = useState("0");
   const [weenusBalance, setWeenusBalance] = useState("0");
+  
+  const [recipientAddress, setRecipientAddress] = useState('0');
+  const [multiplier, setMultiplier] = useState(0);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const [web3] = useInitializeWeb3();
 
@@ -37,6 +41,12 @@ export const App: React.FC = () => {
   //   );
   //   contract.methods.balanceOf(currentAccount).call().then(setWeenusBalance);
   // };
+
+  const onSendFormSubmitClick = (recipientAddress: string, multiplier: number) => {
+    setRecipientAddress(recipientAddress);
+    setMultiplier(multiplier);
+    setShowConfirmation(true);
+  }
 
   const onSendWeenusClick = () => {
     const contract = new web3.eth.Contract(
@@ -69,7 +79,7 @@ export const App: React.FC = () => {
         <button onClick={onSendWeenusClick}>Send 10% of Weenus</button>
 
         <div className="flex justify-center">
-          <Balance ethBalance={ethBalance} weenusBalance={weenusBalance} />
+          <SendForm ethBalance={ethBalance} weenusBalance={weenusBalance} onSubmitClick={onSendFormSubmitClick} />
         </div>
       </div>
     </div>
