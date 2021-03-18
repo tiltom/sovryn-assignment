@@ -3,7 +3,7 @@ import { useInitializeWeb3 } from "./hooks/useInitializeWeb3";
 import { weenusTokenABI } from "./contracts/weenusTokenABI";
 import { Header } from "./components/Header";
 import { SendForm } from "./components/SendForm";
-import { SendConfirmationDialog } from "./components/SendConfirmationDialog/index";
+import { ReviewTransactionDialog } from "./components/ReviewTransactionDialog/index";
 
 const weenusTokenContractAddress = "0x101848D5C5bBca18E6b4431eEdF6B95E9ADF82FA";
 const testSendAccount = "0x0000000000000000000000000000000000000000";
@@ -22,6 +22,8 @@ export const App: React.FC = () => {
   const [multiplier, setMultiplier] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  const [confirmedTxHash, setConfirmedTxHash] = useState('');
+
   const [web3] = useInitializeWeb3();
 
   useEffect(() => {
@@ -35,18 +37,6 @@ export const App: React.FC = () => {
       contract.methods.balanceOf(currentAccount).call().then(setWeenusBalance);
     }
   }, [currentAccount, web3]);
-
-  // const showEthBalance = () => {
-  //   if (currentAccount) web3.eth.getBalance(currentAccount).then(setEthBalance);
-  // };
-
-  // const onWeenusBalanceClick = () => {
-  //   const contract = new web3.eth.Contract(
-  //     weenusTokenABI,
-  //     weenusTokenContractAddress
-  //   );
-  //   contract.methods.balanceOf(currentAccount).call().then(setWeenusBalance);
-  // };
 
   const onSendFormSubmitClick = (
     recipientAddress: string,
@@ -73,7 +63,7 @@ export const App: React.FC = () => {
     contract.methods
       .transfer(testSendAccount, adjustedSendAmount)
       .send()
-      .then((data) => console.log(data));
+      .then((data) => setConfirmedTxHash(data.transactionHash));
 
     // THIS IS IMPORTANT, I need to do the similar check for transaction approval
     //contract.events.Transfer({}, (error, event) => console.log(event));
@@ -89,7 +79,7 @@ export const App: React.FC = () => {
       <div className="content">
         <div className="flex justify-center">
           {showConfirmation ? (
-            <SendConfirmationDialog
+            <ReviewTransactionDialog
               amount={`${balanceDataToNumber(
                 web3.utils.toBN(parseInt(weenusBalance) * multiplier).toString()
               )}`}
@@ -97,6 +87,8 @@ export const App: React.FC = () => {
               receiver={recipientAddress}
               txFee="0.0006 Gwei"
               onClick={onSendWeenusClick}
+              confirmedTxHash={confirmedTxHash}
+              onTransactionConfirmationClick={() => setShowConfirmation(false)}
             />
           ) : (
             <SendForm
