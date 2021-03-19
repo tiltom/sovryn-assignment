@@ -3,8 +3,14 @@ import { useInitializeBlockchainApi } from "./hooks/useInitializeBlockchainApi";
 import { Header } from "./components/Header";
 import { SendForm } from "./components/SendForm";
 import { ReviewTransactionDialog } from "./components/ReviewTransactionDialog/index";
-import { prettifySendAmount } from './utils/prettifySendAmount';
+import { prettifySendAmount } from "./utils/prettifySendAmount";
+import { TransactionConfirmationDialog } from "./components/TransactionConfirmationDialog";
 
+enum AppState {
+  CreateTransaction = "CreateTransaction",
+  ReviewTransaction = "ReviewTransaction",
+  ShowTransactionConfirmation = "ShowTransactionConfirmation",
+}
 
 export const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState("");
@@ -13,9 +19,11 @@ export const App: React.FC = () => {
 
   const [recipientAddress, setRecipientAddress] = useState("0");
   const [multiplier, setMultiplier] = useState(0);
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [txHash, setTxHash] = useState("");
 
-  const [confirmedTxHash, setConfirmedTxHash] = useState('');
+  const [transactionState, setTransactionState] = useState(
+    AppState.CreateTransaction
+  );
 
   const [web3, contract] = useInitializeBlockchainApi();
 
@@ -38,7 +46,7 @@ export const App: React.FC = () => {
   ) => {
     setRecipientAddress(recipientAddress);
     setMultiplier(multiplier);
-    setShowConfirmation(true);
+    setTransactionState(AppState.ReviewTransaction);
   };
 
   const onSendConfirmClick = () => {
@@ -49,10 +57,45 @@ export const App: React.FC = () => {
     contract.methods
       .transfer(recipientAddress, adjustedSendAmount)
       .send()
-      .then((data) => setConfirmedTxHash(data.transactionHash));
+      .then((data) => {
+        setTxHash(data.transactionHash);
+        setTransactionState(AppState.ShowTransactionConfirmation);
+      });
 
     // THIS IS IMPORTANT, I need to do the similar check for transaction approval
     //contract.events.Transfer({}, (error, event) => console.log(event));
+  };
+
+  const getTransactionDialog = (): JSX.Element => {
+    switch (transactionState) {
+      case AppState.CreateTransaction:
+        return (
+          <SendForm
+            ethBalance={ethBalance}
+            weenusBalance={weenusBalance}
+            onSubmitClick={onSendFormSubmitClick}
+          />
+        );
+
+      case AppState.ReviewTransaction:
+        return (
+          <ReviewTransactionDialog
+            amount={prettifySendAmount(web3, weenusBalance, multiplier)}
+            sender={currentAccount}
+            receiver={recipientAddress}
+            txFee="0.0006 Gwei"
+            onClick={onSendConfirmClick}
+          />
+        );
+
+      case AppState.ShowTransactionConfirmation:
+        return (
+          <TransactionConfirmationDialog
+            txHash={txHash}
+            onClick={() => setTransactionState(AppState.CreateTransaction)}
+          />
+        );
+    }
   };
 
   return (
@@ -63,25 +106,7 @@ export const App: React.FC = () => {
       />
 
       <div className="content">
-        <div className="flex justify-center">
-          {showConfirmation ? (
-            <ReviewTransactionDialog
-              amount={prettifySendAmount(web3, weenusBalance, multiplier)}
-              sender={currentAccount}
-              receiver={recipientAddress}
-              txFee="0.0006 Gwei"
-              onClick={onSendConfirmClick}
-              confirmedTxHash={confirmedTxHash}
-              onTransactionConfirmationClick={() => setShowConfirmation(false)}
-            />
-          ) : (
-            <SendForm
-              ethBalance={ethBalance}
-              weenusBalance={weenusBalance}
-              onSubmitClick={onSendFormSubmitClick}
-            />
-          )}
-        </div>
+        <div className="flex justify-center">{getTransactionDialog()}</div>
       </div>
     </div>
   );
