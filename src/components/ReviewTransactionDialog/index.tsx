@@ -34,7 +34,7 @@ export const ReviewTransactionDialog: React.FC<ISendConfirmationDialog> = ({
 
           <div className="text-lg mb-9 font-semibold uppercase">
             <p>Send</p>
-            <p>{amount}</p>
+            <p>{amount} WEENUS</p>
           </div>
 
           <div className="text-sm mb-7">From: {sender}</div>

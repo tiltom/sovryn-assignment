@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useInitializeWeb3 } from "./hooks/useInitializeWeb3";
-import { weenusTokenABI } from "./contracts/weenusTokenABI";
+import { useInitializeBlockchainApi } from "./hooks/useInitializeBlockchainApi";
 import { Header } from "./components/Header";
 import { SendForm } from "./components/SendForm";
 import { ReviewTransactionDialog } from "./components/ReviewTransactionDialog/index";
+import { prettifySendAmount } from './utils/prettifySendAmount';
 
-const weenusTokenContractAddress = "0x101848D5C5bBca18E6b4431eEdF6B95E9ADF82FA";
-const testSendAccount = "0x0000000000000000000000000000000000000000";
-const decimalPlaces = 1e18;
-
-const balanceDataToNumber = (data: string): number => {
-  return parseInt(data) / decimalPlaces;
-};
 
 export const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState("");
@@ -24,19 +17,20 @@ export const App: React.FC = () => {
 
   const [confirmedTxHash, setConfirmedTxHash] = useState('');
 
-  const [web3] = useInitializeWeb3();
+  const [web3, contract] = useInitializeBlockchainApi();
 
   useEffect(() => {
     if (currentAccount !== "") {
       web3.eth.getBalance(currentAccount).then(setEthBalance);
-
-      const contract = new web3.eth.Contract(
-        weenusTokenABI,
-        weenusTokenContractAddress
-      );
       contract.methods.balanceOf(currentAccount).call().then(setWeenusBalance);
     }
-  }, [currentAccount, web3]);
+  }, [contract.methods, currentAccount, web3]);
+
+  useEffect(() => {
+    if (currentAccount) {
+      contract.options.from = currentAccount;
+    }
+  }, [contract.options, currentAccount]);
 
   const onSendFormSubmitClick = (
     recipientAddress: string,
@@ -47,21 +41,13 @@ export const App: React.FC = () => {
     setShowConfirmation(true);
   };
 
-  const onSendWeenusClick = () => {
-    const contract = new web3.eth.Contract(
-      weenusTokenABI,
-      weenusTokenContractAddress,
-      {
-        from: currentAccount, // default from address
-        gasPrice: "20000000000", // default gas price in wei, 20 gwei in this case
-      }
-    );
-
+  const onSendConfirmClick = () => {
     const adjustedSendAmount = web3.utils.toBN(
       parseInt(weenusBalance) * multiplier
     );
+
     contract.methods
-      .transfer(testSendAccount, adjustedSendAmount)
+      .transfer(recipientAddress, adjustedSendAmount)
       .send()
       .then((data) => setConfirmedTxHash(data.transactionHash));
 
@@ -80,13 +66,11 @@ export const App: React.FC = () => {
         <div className="flex justify-center">
           {showConfirmation ? (
             <ReviewTransactionDialog
-              amount={`${balanceDataToNumber(
-                web3.utils.toBN(parseInt(weenusBalance) * multiplier).toString()
-              )}`}
+              amount={prettifySendAmount(web3, weenusBalance, multiplier)}
               sender={currentAccount}
               receiver={recipientAddress}
               txFee="0.0006 Gwei"
-              onClick={onSendWeenusClick}
+              onClick={onSendConfirmClick}
               confirmedTxHash={confirmedTxHash}
               onTransactionConfirmationClick={() => setShowConfirmation(false)}
             />

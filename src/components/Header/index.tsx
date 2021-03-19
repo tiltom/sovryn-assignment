@@ -1,5 +1,5 @@
 import React from "react";
-import { useInitializeWeb3 } from "../../hooks/useInitializeWeb3";
+import { useInitializeBlockchainApi } from "../../hooks/useInitializeBlockchainApi";
 import { ConnectButton } from "./ConnectButton";
 import { LoggedAccount } from "./LoggedAccount";
 
@@ -12,7 +12,7 @@ export const Header: React.FC<IHeader> = ({
   currentAccount,
   setCurrentAccount,
 }) => {
-  const [web3] = useInitializeWeb3();
+  const [web3] = useInitializeBlockchainApi();
 
   const onConnectClick = () => {
     web3.eth.requestAccounts().then(handleRequestAccounts);

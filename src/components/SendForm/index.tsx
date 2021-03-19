@@ -1,9 +1,11 @@
 import React from "react";
-import { useInitializeWeb3 } from "../../hooks/useInitializeWeb3";
+import { useInitializeBlockchainApi } from "../../hooks/useInitializeBlockchainApi";
 import { BalanceFormSection } from "../BalanceFormSection/index";
 import { SendAmountFormSection } from "../SendAmountFormSection/index";
 import { RecipientAddressFormSection } from "../RecipientAddressFormSection/index";
 import { CallToActionButton } from "../CallToActionButton/index";
+import { balanceStringToNumber } from "../../utils/balanceStringToNumber";
+import { prettifySendAmount } from '../../utils/prettifySendAmount';
 
 interface ISendForm {
   ethBalance: string;
@@ -11,19 +13,14 @@ interface ISendForm {
   onSubmitClick: (recipientAddress: string, multiplier: number) => void;
 }
 
-const decimalPlaces = 1e18;
 const testSendAccount = "0x0000000000000000000000000000000000000000";
-
-const balanceDataToNumber = (data: string): number => {
-  return parseInt(data) / decimalPlaces;
-};
 
 export const SendForm: React.FC<ISendForm> = ({
   ethBalance,
   weenusBalance,
   onSubmitClick,
 }) => {
-  const [web3] = useInitializeWeb3();
+  const [web3] = useInitializeBlockchainApi();
 
   const [isWeenusActive, setIsWeenusActive] = React.useState(true);
   const [multiplier, setMultiplier] = React.useState(0);
@@ -35,16 +32,12 @@ export const SendForm: React.FC<ISendForm> = ({
   const onEthClick = () => setIsWeenusActive(false);
   const onWeenusClick = () => setIsWeenusActive(true);
 
-  const availableWeenusBalance = `${balanceDataToNumber(weenusBalance)} WEENUS`;
-  const availableEthBalance = `${balanceDataToNumber(ethBalance)} rETH`;
+  const availableWeenusBalance = `${balanceStringToNumber(weenusBalance)} WEENUS`;
+  const availableEthBalance = `${balanceStringToNumber(ethBalance)} rETH`;
 
   const onPercentageClick = (multiplier: number) => {
     setMultiplier(multiplier);
-    setAmountInputValue(
-      `${balanceDataToNumber(
-        web3.utils.toBN(parseInt(weenusBalance) * multiplier).toString()
-      )}`
-    );
+    setAmountInputValue(prettifySendAmount(web3, weenusBalance, multiplier));
   };
 
   const onRecipientAddressChange = (
