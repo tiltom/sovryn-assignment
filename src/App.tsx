@@ -3,7 +3,7 @@ import { useInitializeBlockchainApi } from "./hooks/useInitializeBlockchainApi";
 import { Header } from "./components/Header";
 import { SendForm } from "./components/SendForm";
 import { ReviewTransactionDialog } from "./components/ReviewTransactionDialog/index";
-import { prettifySendAmount } from "./utils/prettifySendAmount";
+import { formatSendAmount } from "./utils/formatSendAmount";
 import { TransactionConfirmationDialog } from "./components/TransactionConfirmationDialog";
 
 enum AppState {
@@ -12,14 +12,18 @@ enum AppState {
   ShowTransactionConfirmation = "ShowTransactionConfirmation",
 }
 
+const testSendAccount = "0x0000000000000000000000000000000000000000";
+
 export const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [ethBalance, setEthBalance] = useState("0");
   const [weenusBalance, setWeenusBalance] = useState("0");
 
-  const [recipientAddress, setRecipientAddress] = useState("0");
+  const [recipientAddress, setRecipientAddress] = useState(testSendAccount);
   const [multiplier, setMultiplier] = useState(0);
   const [txHash, setTxHash] = useState("");
+
+  const [formattedSendAmount, setFormattedSendAmount] = useState("0");
 
   const [transactionState, setTransactionState] = useState(
     AppState.CreateTransaction
@@ -66,6 +70,11 @@ export const App: React.FC = () => {
     //contract.events.Transfer({}, (error, event) => console.log(event));
   };
 
+  const onPercentageClick = (multiplier: number) => {
+    setMultiplier(multiplier);
+    setFormattedSendAmount(formatSendAmount(web3, weenusBalance, multiplier));
+  };
+
   const getTransactionDialog = (): JSX.Element => {
     switch (transactionState) {
       case AppState.CreateTransaction:
@@ -73,6 +82,11 @@ export const App: React.FC = () => {
           <SendForm
             ethBalance={ethBalance}
             weenusBalance={weenusBalance}
+            multiplier={multiplier}
+            sendAmount={formattedSendAmount}
+            recipientAddress={recipientAddress}
+            onRecipientAddressChange={setRecipientAddress}
+            onPercentageClick={onPercentageClick}
             onSubmitClick={onSendFormSubmitClick}
           />
         );
@@ -80,7 +94,7 @@ export const App: React.FC = () => {
       case AppState.ReviewTransaction:
         return (
           <ReviewTransactionDialog
-            amount={prettifySendAmount(web3, weenusBalance, multiplier)}
+            amount={formatSendAmount(web3, weenusBalance, multiplier)}
             sender={currentAccount}
             receiver={recipientAddress}
             txFee="0.0006 Gwei"

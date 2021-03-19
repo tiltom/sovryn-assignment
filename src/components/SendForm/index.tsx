@@ -4,50 +4,52 @@ import { BalanceFormSection } from "../BalanceFormSection/index";
 import { SendAmountFormSection } from "../SendAmountFormSection/index";
 import { RecipientAddressFormSection } from "../RecipientAddressFormSection/index";
 import { CallToActionButton } from "../CallToActionButton/index";
-import { balanceStringToNumber } from "../../utils/balanceStringToNumber";
-import { prettifySendAmount } from '../../utils/prettifySendAmount';
+import { formatAvailableBalance } from "../../utils/formatAvailableBalance";
 
 interface ISendForm {
   ethBalance: string;
   weenusBalance: string;
+  sendAmount: string;
+  multiplier: number;
+  recipientAddress: string;
+  onRecipientAddressChange: (recipientAddress: string) => void;
+  onPercentageClick: (multiplier: number) => void;
   onSubmitClick: (recipientAddress: string, multiplier: number) => void;
 }
-
-const testSendAccount = "0x0000000000000000000000000000000000000000";
 
 export const SendForm: React.FC<ISendForm> = ({
   ethBalance,
   weenusBalance,
+  sendAmount,
+  multiplier,
+  recipientAddress,
+  onRecipientAddressChange,
   onSubmitClick,
+  onPercentageClick,
 }) => {
   const [web3] = useInitializeBlockchainApi();
 
   const [isWeenusActive, setIsWeenusActive] = React.useState(true);
-  const [multiplier, setMultiplier] = React.useState(0);
-  const [amountInputValue, setAmountInputValue] = React.useState("0");
-  const [recipientAddress, setRecipientAddress] = React.useState(
-    testSendAccount
-  );
 
   const onEthClick = () => setIsWeenusActive(false);
   const onWeenusClick = () => setIsWeenusActive(true);
 
-  const availableWeenusBalance = `${balanceStringToNumber(weenusBalance)} WEENUS`;
-  const availableEthBalance = `${balanceStringToNumber(ethBalance)} rETH`;
+  const availableWeenusBalance = `${formatAvailableBalance(
+    web3,
+    weenusBalance
+  )} WEENUS`;
 
-  const onPercentageClick = (multiplier: number) => {
-    setMultiplier(multiplier);
-    setAmountInputValue(prettifySendAmount(web3, weenusBalance, multiplier));
-  };
+  const availableEthBalance = `${formatAvailableBalance(
+    web3,
+    ethBalance
+  )} rETH`;
 
-  const onRecipientAddressChange = (
-    event: React.FocusEvent<HTMLInputElement>
-  ) => {
-    setRecipientAddress(event.target.value);
+  const onRecipientChange = (event: React.FocusEvent<HTMLInputElement>) => {
+    onRecipientAddressChange(event.target.value);
   };
 
   const isSubmitDisabled =
-    !weenusBalance || !multiplier || !amountInputValue || !recipientAddress;
+    !isWeenusActive || !multiplier || !sendAmount || !recipientAddress;
 
   return (
     <div className="border border-modal-border rounded-3xl p-10 w-100">
@@ -65,14 +67,14 @@ export const SendForm: React.FC<ISendForm> = ({
       />
 
       <SendAmountFormSection
-        amountInputValue={amountInputValue}
+        amountInputValue={sendAmount}
         isWeenusActive={isWeenusActive}
         onPercentageClick={onPercentageClick}
       />
 
       <RecipientAddressFormSection
         recipientAddress={recipientAddress}
-        onChange={onRecipientAddressChange}
+        onChange={onRecipientChange}
       />
 
       <CallToActionButton
