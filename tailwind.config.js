@@ -19,7 +19,14 @@ module.exports = {
       spacing: {
         '100': '25rem',
       },
+      transitionProperty: {
+        'height': 'height'
+      }
     },
+    minWidth: {
+      '0': '0',
+      '100': '25rem',
+     }
   },
   variants: {
     extend: {

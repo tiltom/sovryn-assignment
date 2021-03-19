@@ -12,6 +12,7 @@ interface ISendForm {
   sendAmount: string;
   multiplier: number;
   recipientAddress: string;
+  currentAccount: string;
   onRecipientAddressChange: (recipientAddress: string) => void;
   onPercentageClick: (multiplier: number) => void;
   onSubmitClick: (recipientAddress: string, multiplier: number) => void;
@@ -23,6 +24,7 @@ export const SendForm: React.FC<ISendForm> = ({
   sendAmount,
   multiplier,
   recipientAddress,
+  currentAccount,
   onRecipientAddressChange,
   onSubmitClick,
   onPercentageClick,
@@ -49,10 +51,10 @@ export const SendForm: React.FC<ISendForm> = ({
   };
 
   const isSubmitDisabled =
-    !isWeenusActive || !multiplier || !sendAmount || !recipientAddress;
+    !isWeenusActive || !currentAccount || !multiplier || !sendAmount || !recipientAddress;
 
   return (
-    <div className="border border-modal-border rounded-3xl p-10 w-100">
+    <>
       <div className="text-4xl mb-12 uppercase text-light-text font-extrabold text-center">
         Send
       </div>
@@ -61,7 +63,6 @@ export const SendForm: React.FC<ISendForm> = ({
         availableWeenusBalance={availableWeenusBalance}
         availableEthBalance={availableEthBalance}
         isWeenusActive={isWeenusActive}
-        setIsWeenusActive={setIsWeenusActive}
         onWeenusClick={onWeenusClick}
         onEthClick={onEthClick}
       />
@@ -82,6 +83,6 @@ export const SendForm: React.FC<ISendForm> = ({
         onClick={() => onSubmitClick(recipientAddress, multiplier)}
         isDisabled={isSubmitDisabled}
       />
-    </div>
+    </>
   );
 };

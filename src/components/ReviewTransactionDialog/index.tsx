@@ -16,7 +16,7 @@ export const ReviewTransactionDialog: React.FC<ISendConfirmationDialog> = ({
   txFee,
   onClick,
 }) => (
-  <div className="border border-modal-border text-light-text rounded-3xl p-10 w-100 text-center">
+  <div className="text-light-text text-center">
     <div className="text-2xl mb-12 font-semibold">Review Transaction</div>
 
     <div className="text-lg mb-9 font-semibold uppercase">

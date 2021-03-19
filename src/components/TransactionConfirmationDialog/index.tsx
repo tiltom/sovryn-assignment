@@ -14,7 +14,7 @@ export const TransactionConfirmationDialog: React.FC<ITransactionConfirmationDia
   onClick,
 }) => {
   return (
-    <div className="border border-modal-border text-light-text rounded-3xl p-10 w-100 text-center">
+    <div className="text-light-text text-center">
       <div className="text-2xl mb-6 font-semibold">Transaction Details</div>
 
       <img

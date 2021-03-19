@@ -85,6 +85,7 @@ export const App: React.FC = () => {
             multiplier={multiplier}
             sendAmount={formattedSendAmount}
             recipientAddress={recipientAddress}
+            currentAccount={currentAccount}
             onRecipientAddressChange={setRecipientAddress}
             onPercentageClick={onPercentageClick}
             onSubmitClick={onSendFormSubmitClick}
@@ -120,7 +121,11 @@ export const App: React.FC = () => {
       />
 
       <div className="content">
-        <div className="flex justify-center">{getTransactionDialog()}</div>
+        <div className="flex justify-center mt-10">
+          <div className="border border-modal-border rounded-3xl p-10 min-w-100 transition-height duration-500 ease-in-out">
+            {getTransactionDialog()}
+          </div>
+        </div>
       </div>
     </div>
   );
