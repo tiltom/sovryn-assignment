@@ -47,7 +47,7 @@ export const TransactionConfirmation: React.FC<ITransactionConfirmation> = ({
       </div>
 
       <CallToActionButton
-        label="Submit"
+        label="Close"
         onClick={() => onClick()}
         isPrimary={false}
         isDisabled={false}
