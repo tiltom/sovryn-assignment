@@ -4,7 +4,10 @@ import { Header } from "./components/Header";
 import { SendForm } from "./components/SendForm";
 import { ReviewTransactionDialog } from "./components/ReviewTransactionDialog/index";
 import { formatSendAmount } from "./utils/formatSendAmount";
-import { TransactionConfirmationDialog } from "./components/TransactionConfirmationDialog";
+import {
+  TransactionConfirmationDialog,
+  TransactionState,
+} from "./components/TransactionConfirmationDialog";
 
 enum AppState {
   CreateTransaction = "CreateTransaction",
@@ -12,27 +15,29 @@ enum AppState {
   ShowTransactionConfirmation = "ShowTransactionConfirmation",
 }
 
-const testSendAccount = "0x0000000000000000000000000000000000000000";
-
 export const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [ethBalance, setEthBalance] = useState("0");
   const [weenusBalance, setWeenusBalance] = useState("0");
 
-  const [recipientAddress, setRecipientAddress] = useState(testSendAccount);
+  const [recipientAddress, setRecipientAddress] = useState("");
   const [multiplier, setMultiplier] = useState(0);
   const [txHash, setTxHash] = useState("");
 
   const [formattedSendAmount, setFormattedSendAmount] = useState("0");
 
-  const [transactionState, setTransactionState] = useState(
+  const [applicationState, setApplicationState] = useState(
     AppState.CreateTransaction
+  );
+
+  const [transactionState, setTransactionState] = useState(
+    TransactionState.Pending
   );
 
   const [web3, contract] = useInitializeBlockchainApi();
 
   useEffect(() => {
-    if (currentAccount !== "") {
+    if (currentAccount) {
       web3.eth.getBalance(currentAccount).then(setEthBalance);
       contract.methods.balanceOf(currentAccount).call().then(setWeenusBalance);
     }
@@ -50,7 +55,7 @@ export const App: React.FC = () => {
   ) => {
     setRecipientAddress(recipientAddress);
     setMultiplier(multiplier);
-    setTransactionState(AppState.ReviewTransaction);
+    setApplicationState(AppState.ReviewTransaction);
   };
 
   const onSendConfirmClick = () => {
@@ -61,13 +66,17 @@ export const App: React.FC = () => {
     contract.methods
       .transfer(recipientAddress, adjustedSendAmount)
       .send()
-      .then((data) => {
-        setTxHash(data.transactionHash);
-        setTransactionState(AppState.ShowTransactionConfirmation);
-      });
-
-    // THIS IS IMPORTANT, I need to do the similar check for transaction approval
-    //contract.events.Transfer({}, (error, event) => console.log(event));
+      .on("transactionHash", (hash) => {
+        setTxHash(hash);
+        setApplicationState(AppState.ShowTransactionConfirmation);
+        setTransactionState(TransactionState.Pending);
+      })
+      .then((data) =>
+        setTransactionState(
+          data.status ? TransactionState.Completed : TransactionState.Failed
+        )
+      )
+      .catch(() => setTransactionState(TransactionState.Failed));
   };
 
   const onPercentageClick = (multiplier: number) => {
@@ -75,8 +84,10 @@ export const App: React.FC = () => {
     setFormattedSendAmount(formatSendAmount(web3, weenusBalance, multiplier));
   };
 
+  const txFee = parseFloat(web3.utils.fromWei(contract.options.gasPrice)) * contract.options.gas;
+
   const getTransactionDialog = (): JSX.Element => {
-    switch (transactionState) {
+    switch (applicationState) {
       case AppState.CreateTransaction:
         return (
           <SendForm
@@ -98,7 +109,7 @@ export const App: React.FC = () => {
             amount={formatSendAmount(web3, weenusBalance, multiplier)}
             sender={currentAccount}
             receiver={recipientAddress}
-            txFee="0.0006 Gwei"
+            txFee={txFee}
             onClick={onSendConfirmClick}
           />
         );
@@ -107,7 +118,8 @@ export const App: React.FC = () => {
         return (
           <TransactionConfirmationDialog
             txHash={txHash}
-            onClick={() => setTransactionState(AppState.CreateTransaction)}
+            transactionState={transactionState}
+            onClick={() => setApplicationState(AppState.CreateTransaction)}
           />
         );
     }

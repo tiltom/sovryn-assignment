@@ -2,8 +2,15 @@ import React from "react";
 import { shortenTxHash } from "../../utils/shortenTxHash";
 import { CallToActionButton } from "../CallToActionButton";
 
+
+export enum TransactionState {
+  Pending = 'Pending',
+  Completed = 'Completed',
+  Failed = 'Failed',
+}
 interface ITransactionConfirmationDialog {
   txHash: string;
+  transactionState: TransactionState;
   onClick: () => void;
 }
 
@@ -11,6 +18,7 @@ const ropstenExplorerBaseUrl = "https://ropsten.etherscan.io/tx/";
 
 export const TransactionConfirmationDialog: React.FC<ITransactionConfirmationDialog> = ({
   txHash,
+  transactionState,
   onClick,
 }) => {
   return (
@@ -22,7 +30,7 @@ export const TransactionConfirmationDialog: React.FC<ITransactionConfirmationDia
         className="block max-h-12 m-auto"
         alt="transaction status"
       />
-      <div className="text-lg italic font-light mb-9">Status Pending</div>
+      <div className="text-lg italic font-light mb-9">Status {transactionState}</div>
 
       <div className="text-sm mb-10">
         <span>Tx Hash:</span>

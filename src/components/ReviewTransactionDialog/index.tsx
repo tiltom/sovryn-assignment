@@ -5,7 +5,7 @@ interface ISendConfirmationDialog {
   amount: string;
   sender: string;
   receiver: string;
-  txFee: string;
+  txFee: number;
   onClick: () => void;
 }
 
@@ -36,7 +36,7 @@ export const ReviewTransactionDialog: React.FC<ISendConfirmationDialog> = ({
 
     <div className="text-sm mb-7 flex justify-around">
       <p>Tx fee:</p>
-      <p>{txFee}</p>
+      <p>{txFee} ETH</p>
     </div>
 
     <CallToActionButton
