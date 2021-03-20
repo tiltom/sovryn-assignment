@@ -84,6 +84,13 @@ export const App: React.FC = () => {
     setFormattedSendAmount(formatSendAmount(web3, weenusBalance, multiplier));
   };
 
+  const onTransactionConfirmationClick = () => {
+    setApplicationState(AppState.CreateTransaction);
+    setRecipientAddress('');
+    setMultiplier(0);
+    setFormattedSendAmount('0');
+  }
+
   const txFee = parseFloat(web3.utils.fromWei(contract.options.gasPrice)) * contract.options.gas;
 
   const getTransactionDialog = (): JSX.Element => {
@@ -119,7 +126,7 @@ export const App: React.FC = () => {
           <TransactionConfirmationDialog
             txHash={txHash}
             transactionState={transactionState}
-            onClick={() => setApplicationState(AppState.CreateTransaction)}
+            onClick={onTransactionConfirmationClick}
           />
         );
     }
