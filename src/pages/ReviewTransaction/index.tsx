@@ -1,7 +1,7 @@
 import React from "react";
-import { CallToActionButton } from "../CallToActionButton";
+import { CallToActionButton } from "../../components/CallToActionButton";
 
-interface ISendConfirmationDialog {
+interface IReviewTransaction {
   amount: string;
   sender: string;
   receiver: string;
@@ -9,7 +9,7 @@ interface ISendConfirmationDialog {
   onClick: () => void;
 }
 
-export const ReviewTransactionDialog: React.FC<ISendConfirmationDialog> = ({
+export const ReviewTransaction: React.FC<IReviewTransaction> = ({
   amount,
   sender,
   receiver,

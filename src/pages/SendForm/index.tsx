@@ -1,9 +1,9 @@
 import React from "react";
 import { useInitializeBlockchainApi } from "../../hooks/useInitializeBlockchainApi";
-import { BalanceFormSection } from "../BalanceFormSection/index";
-import { SendAmountFormSection } from "../SendAmountFormSection/index";
-import { RecipientAddressFormSection } from "../RecipientAddressFormSection/index";
-import { CallToActionButton } from "../CallToActionButton/index";
+import { BalanceFormSection } from "./BalanceFormSection/index";
+import { SendAmountFormSection } from "./SendAmountFormSection/index";
+import { RecipientAddressFormSection } from "./RecipientAddressFormSection/index";
+import { CallToActionButton } from "../../components/CallToActionButton/index";
 import { formatAvailableBalance } from "../../utils/formatAvailableBalance";
 import { isValidEthereumAddress } from "../../utils/isValidEthereumAddress";
 

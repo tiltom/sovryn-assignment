@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useInitializeBlockchainApi } from "./hooks/useInitializeBlockchainApi";
 import { Header } from "./components/Header";
-import { SendForm } from "./components/SendForm";
-import { ReviewTransactionDialog } from "./components/ReviewTransactionDialog/index";
+import { SendForm } from "./pages/SendForm";
+import { ReviewTransaction } from "./pages/ReviewTransaction/index";
 import { getFormattedSendAmount } from "./utils/getFormattedSendAmount";
 import {
-  TransactionConfirmationDialog,
+  TransactionConfirmation,
   TransactionState,
-} from "./components/TransactionConfirmationDialog";
+} from "./pages/TransactionConfirmation";
 import { getSendAmount } from "./utils/getSendAmount";
 
 enum AppState {
@@ -119,7 +119,7 @@ export const App: React.FC = () => {
 
       case AppState.ReviewTransaction:
         return (
-          <ReviewTransactionDialog
+          <ReviewTransaction
             amount={getFormattedSendAmount(web3, weenusBalance, multiplier)}
             sender={currentAccount}
             receiver={recipientAddress}
@@ -130,7 +130,7 @@ export const App: React.FC = () => {
 
       case AppState.ShowTransactionConfirmation:
         return (
-          <TransactionConfirmationDialog
+          <TransactionConfirmation
             txHash={txHash}
             transactionState={transactionState}
             onClick={onTransactionConfirmationClick}

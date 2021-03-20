@@ -1,6 +1,6 @@
 import React from "react";
 import { shortenTxHash } from "../../utils/shortenTxHash";
-import { CallToActionButton } from "../CallToActionButton";
+import { CallToActionButton } from "../../components/CallToActionButton";
 
 
 export enum TransactionState {
@@ -8,7 +8,8 @@ export enum TransactionState {
   Completed = 'Completed',
   Failed = 'Failed',
 }
-interface ITransactionConfirmationDialog {
+
+interface ITransactionConfirmation {
   txHash: string;
   transactionState: TransactionState;
   onClick: () => void;
@@ -16,7 +17,7 @@ interface ITransactionConfirmationDialog {
 
 const ropstenExplorerBaseUrl = "https://ropsten.etherscan.io/tx/";
 
-export const TransactionConfirmationDialog: React.FC<ITransactionConfirmationDialog> = ({
+export const TransactionConfirmation: React.FC<ITransactionConfirmation> = ({
   txHash,
   transactionState,
   onClick,
