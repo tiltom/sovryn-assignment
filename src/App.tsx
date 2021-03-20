@@ -120,10 +120,16 @@ export const App: React.FC = () => {
         setCurrentAccount={setCurrentAccount}
       />
 
-      <div className="content">
-        <div className="flex justify-center mt-10">
-          <div className="border border-modal-border rounded-3xl p-10 min-w-100 transition-height duration-500 ease-in-out">
-            {getTransactionDialog()}
+      <div
+        className={`${
+          !currentAccount && "opacity-50 pointer-events-none"
+        } transition-opacity ease-in-out duration-900`}
+      >
+        <div className="content">
+          <div className="flex justify-center mt-10">
+            <div className="border border-modal-border rounded-3xl p-10 min-w-100 transition-height duration-500 ease-in-out">
+              {getTransactionDialog()}
+            </div>
           </div>
         </div>
       </div>

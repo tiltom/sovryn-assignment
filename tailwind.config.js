@@ -21,7 +21,10 @@ module.exports = {
       },
       transitionProperty: {
         'height': 'height'
-      }
+      },
+      transitionDuration: {
+        '900': '900ms',
+       }
     },
     minWidth: {
       '0': '0',
