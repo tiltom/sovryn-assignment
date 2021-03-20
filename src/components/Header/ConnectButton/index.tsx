@@ -6,9 +6,9 @@ interface IConnectButton {
     return (
       <button
         onClick={onClick}
-        className="text-xl border border-solid border-cta bg-transparent border-cta rounded-lg px-5 py-1 hover:bg-cta hover:bg-opacity-75"
+        className="text-base border border-solid border-cta bg-transparent border-cta rounded-lg px-6 py-2.5"
       >
-        Engage wallet
+        Engage Wallet
       </button>
     );
   };

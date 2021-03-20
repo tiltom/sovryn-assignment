@@ -18,6 +18,8 @@ export const Header: React.FC<IHeader> = ({
     web3.eth.requestAccounts().then(handleRequestAccounts);
   };
 
+  const onLogoutClick = () => setCurrentAccount('');
+
   const handleRequestAccounts = (accounts) => {
     if (!accounts) {
       // MetaMask is locked or the user has not connected any accounts
@@ -28,17 +30,17 @@ export const Header: React.FC<IHeader> = ({
   };
 
   return (
-    <div className="flex justify-between bg-black px-6 py-3">
-      <div className="max-h-10">
+    <div className="flex items-center justify-between bg-black px-6 py-3">
+      <div className="h-8">
         <img
           src="/images/Primary Logo - white@2x.png"
           alt="logo"
           className="max-h-full"
         />
       </div>
-      <div className="font-primary text-cta h-10 flex items-center">
+      <div className="font-primary text-cta flex items-center">
         {currentAccount ? (
-          <LoggedAccount currentAccount={currentAccount} />
+          <LoggedAccount currentAccount={currentAccount} onLogoutClick={onLogoutClick} />
         ) : (
           <ConnectButton onClick={onConnectClick} />
         )}
