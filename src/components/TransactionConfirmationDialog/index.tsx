@@ -48,6 +48,7 @@ export const TransactionConfirmationDialog: React.FC<ITransactionConfirmationDia
       <CallToActionButton
         label="Submit"
         onClick={() => onClick()}
+        isPrimary={false}
         isDisabled={false}
       />
     </div>

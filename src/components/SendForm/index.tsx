@@ -5,6 +5,7 @@ import { SendAmountFormSection } from "../SendAmountFormSection/index";
 import { RecipientAddressFormSection } from "../RecipientAddressFormSection/index";
 import { CallToActionButton } from "../CallToActionButton/index";
 import { formatAvailableBalance } from "../../utils/formatAvailableBalance";
+import { isValidEthereumAddress } from "../../utils/isValidEthereumAddress";
 
 interface ISendForm {
   ethBalance: string;
@@ -13,9 +14,11 @@ interface ISendForm {
   multiplier: number;
   recipientAddress: string;
   currentAccount: string;
+  isWeenusActive: boolean;
   onRecipientAddressChange: (recipientAddress: string) => void;
   onPercentageClick: (multiplier: number) => void;
   onSubmitClick: (recipientAddress: string, multiplier: number) => void;
+  onCurrencyTabClick: (isWeenusActive: boolean) => void;
 }
 
 export const SendForm: React.FC<ISendForm> = ({
@@ -25,16 +28,16 @@ export const SendForm: React.FC<ISendForm> = ({
   multiplier,
   recipientAddress,
   currentAccount,
+  isWeenusActive,
   onRecipientAddressChange,
   onSubmitClick,
   onPercentageClick,
+  onCurrencyTabClick,
 }) => {
   const [web3] = useInitializeBlockchainApi();
 
-  const [isWeenusActive, setIsWeenusActive] = React.useState(true);
-
-  const onEthClick = () => setIsWeenusActive(false);
-  const onWeenusClick = () => setIsWeenusActive(true);
+  const onEthClick = () => onCurrencyTabClick(false);
+  const onWeenusClick = () => onCurrencyTabClick(true);
 
   const availableWeenusBalance = `${formatAvailableBalance(
     web3,
@@ -51,7 +54,7 @@ export const SendForm: React.FC<ISendForm> = ({
   };
 
   const isSubmitDisabled =
-    !isWeenusActive || !currentAccount || !multiplier || !sendAmount || !recipientAddress;
+    !isWeenusActive || !currentAccount || !multiplier || !sendAmount || !recipientAddress || !isValidEthereumAddress(recipientAddress);
 
   return (
     <>
@@ -81,6 +84,7 @@ export const SendForm: React.FC<ISendForm> = ({
       <CallToActionButton
         label="Submit"
         onClick={() => onSubmitClick(recipientAddress, multiplier)}
+        isPrimary={true}
         isDisabled={isSubmitDisabled}
       />
     </>

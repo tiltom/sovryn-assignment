@@ -42,6 +42,7 @@ export const ReviewTransactionDialog: React.FC<ISendConfirmationDialog> = ({
     <CallToActionButton
       label="Submit"
       onClick={() => onClick()}
+      isPrimary={true}
       isDisabled={false}
     />
   </div>

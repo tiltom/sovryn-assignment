@@ -6,7 +6,7 @@ interface IConnectButton {
     return (
       <button
         onClick={onClick}
-        className="text-base border border-solid border-cta bg-transparent border-cta rounded-lg px-6 py-2.5"
+        className="text-base border border-solid border-cta bg-transparent border-cta rounded-lg px-6 py-2.5 focus:outline-none"
       >
         Engage Wallet
       </button>

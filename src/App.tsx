@@ -3,11 +3,12 @@ import { useInitializeBlockchainApi } from "./hooks/useInitializeBlockchainApi";
 import { Header } from "./components/Header";
 import { SendForm } from "./components/SendForm";
 import { ReviewTransactionDialog } from "./components/ReviewTransactionDialog/index";
-import { formatSendAmount } from "./utils/formatSendAmount";
+import { getFormattedSendAmount } from "./utils/getFormattedSendAmount";
 import {
   TransactionConfirmationDialog,
   TransactionState,
 } from "./components/TransactionConfirmationDialog";
+import { getSendAmount } from "./utils/getSendAmount";
 
 enum AppState {
   CreateTransaction = "CreateTransaction",
@@ -19,6 +20,7 @@ export const App: React.FC = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [ethBalance, setEthBalance] = useState("0");
   const [weenusBalance, setWeenusBalance] = useState("0");
+  const [isWeenusActive, setIsWeenusActive] = React.useState(true);
 
   const [recipientAddress, setRecipientAddress] = useState("");
   const [multiplier, setMultiplier] = useState(0);
@@ -59,12 +61,10 @@ export const App: React.FC = () => {
   };
 
   const onSendConfirmClick = () => {
-    const adjustedSendAmount = web3.utils.toBN(
-      parseInt(weenusBalance) * multiplier
-    );
-
+    const sendAmount = getSendAmount(web3, weenusBalance, multiplier);
+    
     contract.methods
-      .transfer(recipientAddress, adjustedSendAmount)
+      .transfer(recipientAddress, sendAmount)
       .send()
       .on("transactionHash", (hash) => {
         setTxHash(hash);
@@ -81,13 +81,18 @@ export const App: React.FC = () => {
 
   const onPercentageClick = (multiplier: number) => {
     setMultiplier(multiplier);
-    setFormattedSendAmount(formatSendAmount(web3, weenusBalance, multiplier));
+    setFormattedSendAmount(getFormattedSendAmount(web3, isWeenusActive ? weenusBalance : ethBalance, multiplier));
   };
 
   const onTransactionConfirmationClick = () => {
     setApplicationState(AppState.CreateTransaction);
     setRecipientAddress('');
     setMultiplier(0);
+    setFormattedSendAmount('0');
+  }
+
+  const onCurrencyTabClick = (isWeenusActive: boolean) => {
+    setIsWeenusActive(isWeenusActive);
     setFormattedSendAmount('0');
   }
 
@@ -104,16 +109,18 @@ export const App: React.FC = () => {
             sendAmount={formattedSendAmount}
             recipientAddress={recipientAddress}
             currentAccount={currentAccount}
+            isWeenusActive={isWeenusActive}
             onRecipientAddressChange={setRecipientAddress}
             onPercentageClick={onPercentageClick}
             onSubmitClick={onSendFormSubmitClick}
+            onCurrencyTabClick={onCurrencyTabClick}
           />
         );
 
       case AppState.ReviewTransaction:
         return (
           <ReviewTransactionDialog
-            amount={formatSendAmount(web3, weenusBalance, multiplier)}
+            amount={getFormattedSendAmount(web3, weenusBalance, multiplier)}
             sender={currentAccount}
             receiver={recipientAddress}
             txFee={txFee}
@@ -146,7 +153,7 @@ export const App: React.FC = () => {
       >
         <div className="content">
           <div className="flex justify-center mt-10">
-            <div className="border border-modal-border rounded-3xl p-10 min-w-100 transition-height duration-500 ease-in-out">
+            <div className="border border-modal-border rounded-3xl p-10 min-w-100">
               {getTransactionDialog()}
             </div>
           </div>
