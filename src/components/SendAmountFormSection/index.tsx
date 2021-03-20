@@ -17,7 +17,7 @@ export const SendAmountFormSection: React.FC<ISendAmountFormSection> = ({
       <div className="text-base text-text-light">Amount:</div>
       <div className="mt-2.5">
         <input
-          className="text-base text-black text-right font-semibold w-full px-5 py-2.5 rounded-lg"
+          className="text-base text-black text-right font-semibold w-full px-5 py-2.5 rounded-lg focus:outline-none"
           type="text"
           value={`${amountInputValue} ${isWeenusActive ? "WEENUS" : "rETH"}`}
           readOnly

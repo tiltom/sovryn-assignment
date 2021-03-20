@@ -8,6 +8,9 @@ interface IBalanceFormSection {
   onWeenusClick: () => void;
 }
 
+const commonButtonClasses =
+  "w-6/12 text-light-text font-semibold hover:bg-button-group-hover border border-button-group  px-5 py-2.5 mx-0 outline-none transition ease-out duration-300 focus:bg-button-group-hover focus:outline-none";
+
 export const BalanceFormSection: React.FC<IBalanceFormSection> = ({
   availableWeenusBalance,
   availableEthBalance,
@@ -22,26 +25,30 @@ export const BalanceFormSection: React.FC<IBalanceFormSection> = ({
         <div className="flex rounded-lg text-lg" role="group">
           <button
             onClick={onEthClick}
-            className={`w-6/12 ${
-              !isWeenusActive && "bg-button-group-hover"
-            } ${isWeenusActive && 'text-opacity-50'} text-light-text font-semibold hover:bg-button-group-hover border border-button-group rounded-l-lg px-5 py-2.5 mx-0 outline-none focus:bg-button-group-hover focus:outline-none`}
+            className={`${!isWeenusActive && "bg-button-group-hover"} ${
+              isWeenusActive && "text-opacity-50"
+            } ${commonButtonClasses} rounded-l-lg`}
           >
             <img
               src="/images/Ethereum logo@2x.png"
-              className={`max-h-6 inline mr-1.5 ${isWeenusActive && 'opacity-50'}`}
+              className={`max-h-6 inline mr-1.5 ${
+                isWeenusActive && "opacity-50"
+              }`}
               alt="Ethereum logo"
             />
             rEth
           </button>
           <button
             onClick={onWeenusClick}
-            className={`w-6/12 ${
-              isWeenusActive && "bg-button-group-hover"
-            } ${!isWeenusActive && 'text-opacity-50'} text-light-text font-semibold hover:bg-button-group-hover border border-button-group rounded-r-lg px-5 py-2.5 mx-0 outline-none focus:bg-button-group-hover focus:outline-none`}
+            className={`${isWeenusActive && "bg-button-group-hover"} ${
+              !isWeenusActive && "text-opacity-50"
+            } ${commonButtonClasses} rounded-r-lg`}
           >
             <img
               src="/images/Weenus logo@2x.png"
-              className={`max-h-6 inline mr-1.5 ${!isWeenusActive && 'opacity-50'}`}
+              className={`max-h-6 inline mr-1.5 ${
+                !isWeenusActive && "opacity-50"
+              }`}
               alt="Weenus logo"
             />
             Weenus

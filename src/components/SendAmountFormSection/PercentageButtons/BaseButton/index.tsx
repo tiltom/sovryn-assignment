@@ -12,7 +12,7 @@ export const BaseButton: React.FC<IBaseButton> = ({
 }) => (
   <button
     onClick={onClick}
-    className={`w-1/5 py-1.5 text-button-group text-sm hover:bg-button-group-hover border border-button-group mx-0 outline-none focus:bg-button-group-hover focus:outline-none ${
+    className={`transition ease-out duration-300 w-1/5 py-1.5 text-button-group text-sm hover:bg-button-group-hover border border-button-group mx-0 outline-none focus:bg-button-group-hover focus:outline-none ${
       className && className
     }`}
   >
